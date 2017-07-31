@@ -1,0 +1,348 @@
+影响红葡萄酒品质的化学成分探索
+========================================================
+本报告探讨的数据集包含1,599 种红酒，以及 11个关于酒的化学成分的变量。至少3名葡萄酒专家对每
+种酒的品质进行了评分，分数在 0（非常差）和10（非常好）之间。
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# Load all of the packages that you end up using
+# in your analysis in this code chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk.
+# This prevents the code from displaying in the knitted HTML output.
+# You should set echo=FALSE for all code chunks in your file.
+
+library(ggplot2)
+library(corrplot)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+wineQualityReds <- read.csv('wineQualityReds.csv')
+```
+
+# 单变量部分
+```{r echo=FALSE, Univariate_Plots}
+dim(wineQualityReds)
+names(wineQualityReds)
+str(wineQualityReds)
+summary(wineQualityReds)
+```
+
+```{r echo=FALSE}
+#红酒品质直方图
+ggplot(aes(x = quality), data = wineQualityReds) +
+  geom_histogram(binwidth = 1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(3, 8, 1))
+```
+
+### 红葡萄酒品质基本符合正态分布，大多数是5和6
+
+```{r echo=FALSE}
+#固定酸度直方图
+ggplot(aes(x = fixed.acidity), data = wineQualityReds) +
+  geom_histogram(binwidth = 1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, 16, 1))
+```
+
+### 红葡萄酒固定酸度集中在7到8之间
+
+```{r echo=FALSE}
+#挥发性酸度直方图
+ggplot(aes(x = volatile.acidity), data = wineQualityReds) +
+  geom_histogram(binwidth = .1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0.1, 1.6, .1))
+```
+
+### 可以看出大多数红葡萄酒的挥发性酸度集中在0.3到0.7之间，只有极少数红葡萄酒的挥发性酸度少于0.2或者超过1.1，这很有可能是异常值
+
+```{r echo=FALSE}
+#柠檬酸直方图
+ggplot(aes(x = citric.acid), data = wineQualityReds) +
+  geom_histogram(binwidth = .05, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, 1, .05))
+```
+
+### 红葡萄酒的柠檬酸大多数在低于0.5
+
+```{r echo=FALSE}
+#残糖直方图
+ggplot(aes(x = residual.sugar), data = wineQualityReds) +
+  geom_histogram(binwidth = 1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, 16, 1))
+```
+
+### 大多数值分布在1.5到3之间，峰值大约在2，极少数红葡萄酒的残糖超过4，这有可能是异常值
+
+```{r echo=FALSE}
+#氯化物直方图
+ggplot(aes(x = chlorides), data = wineQualityReds) +
+  geom_histogram(binwidth = .01, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, .6, .05))
+```
+
+### 大多数红葡萄酒的氯化物集中在0.06到0.1之间，峰值大约在0.075,少数超过0.15的可能是异常值
+
+```{r echo=FALSE}
+#游离二氧化硫直方图
+ggplot(aes(x = free.sulfur.dioxide), data = wineQualityReds) +
+  geom_histogram(binwidth = 1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, 80, 5))
+```
+
+### 大多数值在5到20之间，峰值大约在5
+
+```{r echo=FALSE}
+#二氧化硫总量直方图
+ggplot(aes(x = total.sulfur.dioxide), data = wineQualityReds) +
+  geom_histogram(binwidth = 10, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, 200, 10))
+```
+
+### 大多数值在10到70之间，峰值大约在20
+
+```{r echo=FALSE}
+#密度直方图
+ggplot(aes(x = density), data = wineQualityReds) +
+  geom_histogram(binwidth = .001, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, 1, .001))
+```
+
+### 大多数值在0.993到1之间，峰值大约在0.997
+
+```{r echo=FALSE}
+#pH直方图
+ggplot(aes(x = pH), data = wineQualityReds) +
+  geom_histogram(binwidth = .1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(3, 4, .1))
+```
+
+### 大多数值在3.1到3.5之间，峰值大约在3.3
+
+```{r echo=FALSE}
+#硫酸盐直方图
+ggplot(aes(x = sulphates), data = wineQualityReds) +
+  geom_histogram(binwidth = .1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(0, 2, .1))
+```
+
+### 大多数值在0.4到0.9之间，峰值大约在0.6
+
+```{r echo=FALSE}
+#酒精直方图
+ggplot(aes(x = alcohol), data = wineQualityReds) +
+  geom_histogram(binwidth = .5, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(8, 14, .5))
+```
+
+### 大多数值在9到12之间，峰值大约在9.5
+
+# 单变量分析
+
+### 你的数据集的结构是什么
+
+### 在数据集中有1,599 种红酒，以及 11个关于酒的化学成分的变量（固定酸度、挥发性酸度、柠檬酸、残糖、氯化物、游离二氧化硫、二氧化硫总量、密度、pH、硫酸盐、酒精）。
+
+### 数据集的主要特征是什么？
+
+### 红葡萄酒的品质主要集中在5和6。
+
+### 你认为数据集中还有哪些其他特征可以帮助您调查您的兴趣特征？
+
+### 酒精、硫酸盐、氯化物。
+
+### 你是否从数据集中的现有变量创建了任何新变量？
+
+### 没有。
+
+### 在你调查的特征中，是否有不寻常的分布？你是否对数据执行任何操作以整理，调整或更改数据的形式？如果是这样，你为什么这么做？
+
+### 有，挥发性酸度、残糖、氯化物，游离二氧化硫、二氧化硫总量、硫酸盐、酒精，我会调整X轴，因为只有缩小X轴的范围去除异常值才会得出正常的分布。
+
+## 在单变量分析过程中，只能看到变量本身的情况，并不能反应和红葡萄酒质量之间的关系，所以要进一步分析。
+
+# 双变量图
+
+```{r echo=FALSE, Bivariate_Plots}
+#相关系数
+cor(wineQualityReds)
+wine <- cor(wineQualityReds)
+corrplot(wine)
+```
+
+### 从相关系数图可以看出，固定酸度、柠檬酸、残糖、氯化物、游离二氧化硫、二氧化硫总量、密度、pH、硫酸盐与红葡萄酒品质没有很强的相关性，挥发性酸度、柠檬酸、硫酸盐、酒精与红葡萄酒品质有明显的相关性，我想对这四个变量进行进一步分析。
+
+```{r echo=FALSE}
+#品质-挥发性酸度箱线图
+ggplot(aes(x = factor(quality), y = volatile.acidity), data = wineQualityReds) +
+  geom_boxplot() +
+  scale_y_continuous(breaks = seq(0, 1.6, .1))
+```
+
+###可以看出挥发性酸度与红葡萄酒品质呈负相关关系，品质好的红葡萄酒挥发性酸度较低
+
+```{r echo=FALSE}
+#品质-柠檬酸箱线图
+ggplot(aes(x = factor(quality), y = citric.acid), data = wineQualityReds) +
+  geom_boxplot() +
+  scale_y_continuous(breaks = seq(0, 1, .05))
+```
+
+###可以看出红葡萄酒品质与柠檬酸是正相关关系，品质好的红葡萄酒柠檬酸较高
+
+```{r echo=FALSE}
+#品质-硫酸盐箱线图
+ggplot(aes(x = factor(quality), y = sulphates), data = wineQualityReds) +
+  geom_boxplot() +
+  scale_y_continuous(breaks = seq(0, 2, .1))
+```
+
+### 红葡萄酒品质与硫酸盐是正相关关系，品质好的红葡萄酒硫酸盐较高
+
+```{r echo=FALSE}
+#品质-酒精箱线图
+ggplot(aes(x = factor(quality), y = alcohol), data = wineQualityReds) +
+  geom_boxplot() +
+  scale_y_continuous(breaks = seq(0, 15, 1))
+```
+
+### 红葡萄酒品质与酒精是正相关关系，品质好的红葡萄酒的酒精较高
+
+# 双变量分析
+
+### 谈谈你在这部分调查中观察到的一些关系。感兴趣的特征与数据集中的其他特征有何不同？
+
+### 红葡萄酒品质与柠檬酸、硫酸盐、酒精是正相关，与挥发酸度负相关，其他变量与红葡萄酒品质的相关性非常微弱。
+
+### 你是否观察到其他特征之间的任何有趣的关系（不是感兴趣的主要特征）？
+
+### 没有
+
+### 你发现最强的关系是什么？
+
+### 挥发性酸度与红葡萄酒品质的负相关关系，酒精与挥发性酸度的正相关关系
+
+从双变量分析过程中得出了挥发性酸度、柠檬酸、硫酸盐、酒精与红葡萄酒品质的相关性，这些变量是影响红葡萄酒品质的主要因素，下面继续进行多变量分析
+
+# 多变量图
+
+```{r echo=FALSE, Multivariate_Plots}
+#挥发性酸度-品质-柠檬酸散点图 
+ggplot(aes(x = volatile.acidity, y = citric.acid, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#挥发性酸度-品质-硫酸盐散点图
+ggplot(aes(x = volatile.acidity, y = sulphates, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#挥发性酸度-品质-酒精散点图
+ggplot(aes(x = volatile.acidity, y = alcohol, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+```
+
+### 从挥发性酸度和品质与柠檬酸、硫酸盐、酒精的散点图可以看出，挥发性酸度越低红葡萄酒品质越好
+
+```{r echo=FALSE}
+#柠檬酸-品质-挥发性酸度散点图
+ggplot(aes(x = citric.acid, y = volatile.acidity, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#柠檬酸-品质-硫酸盐散点图
+ggplot(aes(x = citric.acid, y = sulphates, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#柠檬酸-品质-酒精散点图
+ggplot(aes(x = citric.acid, y = alcohol, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+```
+
+### 从柠檬酸和品质与挥发性酸度、硫酸盐、酒精的散点图可以看出，柠檬酸对红葡萄酒品质的影响并不大
+
+```{r echo=FALSE}
+#硫酸盐-品质-挥发性酸度散点图
+ggplot(aes(x = sulphates, y = volatile.acidity, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#硫酸盐-品质-柠檬酸散点图
+ggplot(aes(x = sulphates, y = citric.acid, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#硫酸盐-品质-酒精散点图
+ggplot(aes(x = sulphates, y = alcohol, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+```
+
+### 从硫酸盐和品质与挥发性酸度、柠檬酸、酒精的散点图可以看出，硫酸盐越高红葡萄酒品质越好
+
+```{r echo=FALSE}
+#酒精-品质-挥发性酸度散点图
+ggplot(aes(x = alcohol, y = volatile.acidity, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#酒精-品质-柠檬酸散点图
+ggplot(aes(x = alcohol, y = citric.acid, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+
+#酒精-品质-硫酸盐散点图
+ggplot(aes(x = alcohol, y = sulphates, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+```
+
+### 从酒精和品质与柠檬酸、挥发性酸度、硫酸盐的散点图可以看出，柠檬酸和酒精越高，红葡萄酒品质越好，高硫酸盐和高酒精与红葡萄酒的品质是正相关的。
+
+# 多变量分析
+
+### 谈谈你在这部分调查中观察到的一些关系。在查看你感兴趣的功能方面有哪些功能相互加强？
+
+### 高酒精有助于红葡萄酒的品质，低挥发性酸度有助于红葡萄酒的品质，高酒精和高柠檬酸或高硫酸盐相互加强。
+
+### 功能之间有什么有趣或令人惊奇的交互？
+
+### 柠檬酸单独对红葡萄酒的品质几乎没有影响，但是较高的柠檬酸和较高的酒精会对红葡萄酒的品质产生积极影响。
+
+### 可选：您是否在数据集中创建了任何模型？讨论你的模型的优势和局限性。
+
+### 没有。
+
+------
+
+# 最终情节和总结
+
+### 情节一
+```{r echo=FALSE, Plot_One}
+#红酒品质直方图
+ggplot(aes(x = quality), data = wineQualityReds) +
+  geom_histogram(binwidth = 1, fill = '#5760AB') +
+  scale_x_continuous(breaks = seq(3, 8, 1))
+```
+
+### 说明一
+
+### 红酒品质直方图说明大多数红葡萄酒品质是5和6，所以我们要找到数据集中的其他变量对红葡萄酒品质的影响
+
+### 情节二
+```{r echo=FALSE, Plot_Two}
+#酒精-品质-挥发性酸度散点图
+ggplot(aes(x = alcohol, y = volatile.acidity, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+```
+
+### 说明二
+
+### 酒精和红葡萄酒品质有较强的正相关关系，挥发性酸度和红葡萄酒品质有较强的负相关关系，酒精越高，挥发性酸度越低，红葡萄酒品质越好。
+
+### 情节三
+```{r echo=FALSE, Plot_Three}
+#酒精-品质-硫酸盐散点图
+ggplot(aes(x = alcohol, y = sulphates, color = factor(quality)), data = wineQualityReds) +
+  geom_point()
+```
+
+### 说明三
+
+### 酒精和硫酸盐与红葡萄酒品质是正相关关系，酒精越高，硫酸盐越高，红葡萄酒品质越好。
+
+------
+
+# 反馈
+
+### 红葡萄酒数据集包含1599种葡萄酒信息，我从理解数据集中的各个变量开始，对各个变量进行观察，探索红葡萄酒中的化学成分对红葡萄酒品质的影响，酒精和红葡萄酒品质有较强的正相关关系，挥发性酸度和红葡萄酒品质有较强的负相关关系，酒精越高，挥发性酸度越低，红葡萄酒品质越好。酒精和硫酸盐与红葡萄酒品质是正相关关系，酒精越高，硫酸盐越高，红葡萄酒品质越好。柠檬酸单独对红葡萄酒的品质几乎没有影响，但是较高的柠檬酸和较高的酒精会对红葡萄酒的品质产生积极影响。
