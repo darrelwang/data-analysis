@@ -1,5 +1,5 @@
 # data-analysis
-数据分析、机器学习、深度学习相关项目   
+**数据分析、机器学习、深度学习相关项目**   
 
 DAAP1_osm-使用pyton对OpenStreetMap地图数据进行清洗   
 
