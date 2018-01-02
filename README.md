@@ -24,4 +24,6 @@ sentiment-network-用神经网络进行情感分析
 
 sentiment-rnn-用RNN进行情感分析   
 
-tflearn-sentiment-analysis-solution-用TFlearn进行情感分析
+tflearn-sentiment-analysis-solution-用TFlearn进行情感分析   
+
+LendingClub-对LendingClub数据集使用集成学习方法构建金融反欺诈模型
